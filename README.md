@@ -2,8 +2,17 @@ This repo is a means to publish JSON schema files on a public site so that they 
 
 ```json
 {
-  "$schema": "https://Opus-PNC/Opus-PNC.github.io/test-schema.json",
-  "type": "object",
+  "$schema": "https://Opus-PNC/Opus-PNC.github.io/opus-menu-schema.json",
+  "menuTree": {
+    "menuType": "branch",
+    "menuId": "mainMenu",
+    "menuTitle": {
+      "text": "** Main Menu **"
+    }
+    "submenus": [
+      ...      
+    ]
+  }
   ...
 }
 ```
