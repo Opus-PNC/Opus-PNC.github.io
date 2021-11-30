@@ -1,0 +1,445 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "menuSetParams": {
+      "type": "object",
+      "$ref": "#/$defs/menuParmSet"
+    },
+    "menuTree": {
+      "type": "object",
+      "$ref": "#/$defs/menuItem",
+      "title": "Main menu",
+      "description": "The top level menu and (optionally) any submenus just below it"
+    }
+  },
+  "required": [
+    "menuSetParams",
+    "menuTree"
+  ],
+  "$defs": {
+    "menuItem": {
+      "type": "object",
+      "title": "Menu item",
+      "description": "Menu tree branch or leaf.  Specify \"menuType\" first to determine what other properties are required.",
+      "oneOf": [
+        {
+          "properties": {
+            "menuType": {
+              "title": "Menu type",
+              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text.",
+              "const": "branch"
+            },
+            "menuTitle": {
+              "type": "object",
+              "$ref": "#/$defs/fixedText",
+              "description": "Menu name to be shown on the LCD.  Default position is centered, but you can override that by using the position/justify property.  Row and column are ignored and are set by the firmware.  When it is shown as a submenu (on the bottom row) then it will be centered.  If left/right arrows are used to navigate submenus, keep the string length <= 18 to leave room for the arrows.",
+              "maxLength": 20
+            },
+            "menuId": {
+              "type": "string",
+              "title": "Unique id",
+              "description": "Unique text id for reference locally and by host.  Alphanumeric with no spaces or special characters.",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+              "minLength": 2,
+              "maxLength": 12
+            },
+            "submenus": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/menuItem"
+              },
+              "description": "list of submenus below this menu tree branch.  The submenus will be presented in the order they are in the file."
+            }
+          },
+          "required": [
+            "menuType",
+            "menuTitle",
+            "menuId",
+            "submenus"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "menuType": {
+              "title": "Menu type",
+              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text.",
+              "const": "leaf"
+            },
+            "menuTitle": {
+              "type": "object",
+              "$ref": "#/$defs/fixedText",
+              "description": "Menu name to be shown on the LCD.  Default position is centered, but you can override that by using the position/justify property.",
+              "maxLength": 20
+            },
+            "menuId": {
+              "type": "string",
+              "title": "Unique id",
+              "description": "Unique text id for reference locally and by host.  Alphanumeric with no spaces or special characters.",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+              "minLength": 2,
+              "maxLength": 12
+            },
+            "screens": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/screen"
+              },
+              "description": "List of screens available under this menu tree leaf.  The screens will be presented in the order they are in the file."
+            }
+          },
+          "required": [
+            "menuType",
+            "menuTitle",
+            "menuId",
+            "screens"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "screen": {
+      "type": "object",
+      "title": "LCD Screen definition",
+      "description": "A screen is made up of text strings and variables.  It should contain one or the other or both.  An empty screen will be ignored.",
+      "properties": {
+        "screenId": {
+          "type": "string",
+          "title": "Unique id",
+          "description": "Unique text id for reference locally and by host.  Alphanumeric with no spaces or special characters.",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "minLength": 2,
+          "maxLength": 12
+        },
+        "textBlocks": {
+          "type": "array",
+          "title": "Text Blocks",
+          "description": "Array of zero or more fixed text strings to place on the LCD",
+          "items": {
+            "$ref": "#/$defs/fixedText"
+          },
+          "examples": [
+            [
+              {
+                "text": "Default position"
+              }
+            ],
+            [
+              {
+                "text": "Left justified",
+                "position": {
+                  "row": 0,
+                  "column": 0,
+                  "justify": "left"
+                }
+              }
+            ],
+            [
+              {
+                "text": "Centered text",
+                "position": {
+                  "row": 0,
+                  "column": 0,
+                  "justify": "center"
+                }
+              }
+            ],
+            [
+              {
+                "text": "Right@12:",
+                "position": {
+                  "row": 1,
+                  "column": 12,
+                  "justify": "right"
+                }
+              }
+            ]
+          ]
+        },
+        "variables": {
+          "type": "array",
+          "title": "Variables",
+          "description": "Array of zero or more variables to display on the screen",
+          "items": {
+            "type": "object",
+            "title": "Variable",
+            "description": "Object specifies the variable, format and screen position",
+            "properties": {
+              "variable": {
+                "type": "object",
+                "title": "Variable Definition",
+                "description": "Variable specification.  The settings depend on the \"varType\" selected, so set \"varType\" first.",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variables/pnVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/dateVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/timeVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/tempVal"
+                  }
+                ]
+              },
+              "position": {
+                "type": "object",
+                "$ref": "#/$defs/position"
+              }
+            },
+            "required": [
+              "variable"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "screenId"
+      ]
+    },
+    "fixedText": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "position": {
+          "type": "object",
+          "$ref": "#/$defs/position"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [
+        {
+          "text": "Default position"
+        },
+        {
+          "text": "Left justified",
+          "position": {
+            "row": 0,
+            "column": 0,
+            "justify": "left"
+          }
+        },
+        {
+          "text": "Centered",
+          "position": {
+            "row": 0,
+            "column": 0,
+            "justify": "center"
+          }
+        },
+        {
+          "text": "Right@12:",
+          "position": {
+            "row": 1,
+            "column": 12,
+            "justify": "right"
+          }
+        }
+      ]
+    },
+    "variables": {
+      "pnVal": {
+        "properties": {
+          "varType": {
+            "const": "pnVal"
+          },
+          "showUnits": {
+            "const": true
+          }
+        },
+        "required": [
+          "varType",
+          "showUnits"
+        ],
+        "additionalProperties": false
+      },
+      "dateVal": {
+        "properties": {
+          "varType": {
+            "const": "date"
+          },
+          "dateVal": {
+            "enum": [
+              "sysDate"
+            ]
+          },
+          "dateFmt": {
+            "enum": [
+              "yyyy.mm.dd"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "dateVal"
+        ],
+        "additionalProperties": false
+      },
+      "timeVal": {
+        "properties": {
+          "varType": {
+            "const": "time"
+          },
+          "timeVal": {
+            "enum": [
+              "sysTime"
+            ]
+          },
+          "timeFmt": {
+            "enum": [
+              "hh:mm:ss"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "timeVal"
+        ],
+        "additionalProperties": false
+      },
+      "tempVal": {
+        "properties": {
+          "varType": {
+            "const": "temperature"
+          },
+          "tempVal": {
+            "enum": [
+              "evapTemp"
+            ]
+          },
+          "format": {
+            "enum": [
+              "999",
+              "999.9"
+            ]
+          },
+          "showUnits": {
+            "varType": "boolean"
+          }
+        },
+        "required": [
+          "varType",
+          "tempVal"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "position": {
+      "type": "object",
+      "title": "LCD position",
+      "description": "Optional coordinates and justification to specify the position on the screen",
+      "properties": {
+        "row": {
+          "type": "integer",
+          "title": "LCD Row",
+          "description": "Top row is 0.  Default will be used if not specified or the row is determined by the usage (e.g.- menu title moves from top to bottom row if a sub menu)",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "column": {
+          "type": "integer",
+          "title": "LCD Column",
+          "description": "Leftmost column is 0.  Default will be used if not specified or the column is determined by the usage.",
+          "minimum": 0,
+          "maximum": 19
+        },
+        "justify": {
+          "title": "Text justification",
+          "description": "How to position the text within the row or field.  Left or right justification is against the specified (or default) column.  Center justification centers on the whole row.",
+          "enum": [
+            "left",
+            "right",
+            "center"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "menuParmSet": {
+      "type": "object",
+      "required": [
+        "menuSetName",
+        "language",
+        "useMenuArrows",
+        "minFwVersion",
+        "schemaVersion",
+        "menuFileRev"
+      ],
+      "properties": {
+        "menuSetName": {
+          "type": "string",
+          "description": "Name that will be reported to host to check which screen set is installed",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "minLength": 4,
+          "maxLength": 20
+        },
+        "language": {
+          "enum": [
+            "English",
+            "German"
+          ],
+          "description": "Which language is used on the screens.  This is required to enable special handling for non-ASCII letters."
+        },
+        "useMenuArrows": {
+          "type": "boolean",
+          "title": "Use Menu Arrows?",
+          "description": "If true, left and right arrows will be used to indicate when there are more submenu items that can be accessed through the left and right keys.",
+          "default": true
+        },
+        "leftArrowCode": {
+          "type": "integer",
+          "description": "Character code for left arrow for menu navigation.  Suggestions: 127 for left arrow, 60 for ASCII '<'",
+          "minimum": 0,
+          "maximum": 255,
+          "examples": [
+            127,
+            60
+          ]
+        },
+        "rightArrowCode": {
+          "type": "integer",
+          "description": "Character code for right arrow for menu navigation.  Suggestions: 126 for right arrow, 62 for ASCII '>'",
+          "minimum": 0,
+          "maximum": 255,
+          "examples": [
+            126,
+            62
+          ]
+        },
+        "minFwVersion": {
+          "type": "string",
+          "const": "0.1.17",
+          "default": "0.1.17",
+          "title": "Minimum Opus FW version",
+          "description": "This version or later is required to be able to parse all the features of this JSON schema."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "const": 1,
+          "default": 1,
+          "title": "Menu file JSON schema version",
+          "description": "This defines the JSON data structure that this file conforms to, set by the standard reference file referred to in \"$schema\""
+        },
+        "menuFileRev": {
+          "type": "integer",
+          "title": "Menu File Revision",
+          "description": "Single integer revision number for this menu file.  You may use whatever numbering scheme you like.  The host may use this to determine if the installed file needs to be updated.",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
