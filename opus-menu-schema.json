@@ -250,6 +250,7 @@
     },
     "variables": {
       "pnVal": {
+        "description": "PN is a special case, with units always shown, and no other text allowed on the same line to ensure that the value isn't modified.  Also, the left/center/right justification may be used, but the column specification is ignored to ensure that the whole value and units are always shown on the screen.",
         "properties": {
           "varType": {
             "const": "pnVal"
@@ -318,7 +319,7 @@
               "evapTemp"
             ]
           },
-          "format": {
+          "tempFmt": {
             "enum": [
               "999",
               "999.9"
