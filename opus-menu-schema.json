@@ -331,7 +331,8 @@
         },
         "required": [
           "varType",
-          "tempVal"
+          "tempVal",
+          "tempFmt"
         ],
         "additionalProperties": false
       }
