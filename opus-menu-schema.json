@@ -250,18 +250,26 @@
     },
     "variables": {
       "pnVal": {
-        "description": "PN is a special case, with units always shown, and no other text allowed on the same line to ensure that the value isn't modified.  Also, the left/center/right justification may be used, but the column specification is ignored to ensure that the whole value and units are always shown on the screen.",
+        "description": "PN is a special case, with units always shown, and no other text allowed on the same line to ensure that the value isn't modified.",
         "properties": {
           "varType": {
             "const": "pnVal"
           },
-          "showUnits": {
-            "const": true
+          "zeroStr": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Zeroing text",
+            "description": "Optional text to replace the English \"Zeroing\" to describe when the bench is in the zeroing state.  Used on PN screen as \"PN: <your text here>.  If not specified, the default English will be used."
+          },
+          "rinseStr": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Rinsing text",
+            "description": "Optional text to replace the English \"Rinsing\" to describe when the bench is in the rinsing state.  Used on PN screen as \"PN: <your text here>.  If not specified, the default English will be used."
           }
         },
         "required": [
-          "varType",
-          "showUnits"
+          "varType"
         ],
         "additionalProperties": false
       },
