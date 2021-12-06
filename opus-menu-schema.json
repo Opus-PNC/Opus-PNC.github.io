@@ -11,11 +11,20 @@
       "$ref": "#/$defs/menuItem",
       "title": "Main menu",
       "description": "The top level menu and (optionally) any submenus just below it"
+    },
+    "soloScreens": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/screen"
+      },
+      "title": "Special Solo Screens",
+      "description": "List of special stand-alone screens.  These screens cannot be reached with the navigation keys and will only be shown when events trigger their display (so each should have an associated `showOnEvent` or it will never show).  The Esc key will exit these screens and return to the home menu.  \nExamples are a file transfer status screen and screens for temporary notices such as a boot screen. \nEach screen is an object, so it should be wrapped in curly braces {}. \nThe order of the solo screens doesn't matter since they are not navigable siblings.  They can only return to the home screen."
     }
-  },
+},
   "required": [
     "menuSetParams",
-    "menuTree"
+    "menuTree",
+    "soloScreens"
   ],
   "$defs": {
     "menuItem": {
@@ -27,7 +36,7 @@
           "properties": {
             "menuType": {
               "title": "Menu type",
-              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text.",
+              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text. \nThe data screens under a \"leaf_wrap\" will wrap around at the ends when navigating through the list.  The data screens under a \"leaf_no_wrap\" menu will not wrap around.",
               "const": "branch"
             },
             "menuTitle": {
@@ -64,8 +73,8 @@
           "properties": {
             "menuType": {
               "title": "Menu type",
-              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text.",
-              "const": "leaf"
+              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text. \nThe data screens under a \"leaf_wrap\" will wrap around at the ends when navigating through the list.  The data screens under a \"leaf_no_wrap\" menu will not wrap around.",
+              "enum": [ "leaf_wrap", "leaf_no_wrap" ]
             },
             "menuTitle": {
               "type": "object",
@@ -111,6 +120,17 @@
           "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
           "minLength": 2,
           "maxLength": 12
+        },
+        "showOnEvent": {
+          "enum": [
+            "fileXfer",
+            "benchCommErr",
+            "hostCommErr",
+            "leakTest",
+            "benchFwUpdate",
+            "menusLoaded"
+          ],
+          "description": "If specified, this screen will automatically be shown when the event occurs.  \nFor example, a screen to show the file transfer progress can automatically be shown when a file transfer starts. \nNote that each event can only trigger one (or no) event, so if you specify the same event for multiple screens, only the last one in the file will be activated."
         },
         "textBlocks": {
           "type": "array",
@@ -182,6 +202,15 @@
                   },
                   {
                     "$ref": "#/$defs/variables/tempVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/countVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/stringVar"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/progressVal"
                   }
                 ]
               },
@@ -253,7 +282,8 @@
         "description": "PN is a special case, with units always shown, and no other text allowed on the same line to ensure that the value isn't modified.",
         "properties": {
           "varType": {
-            "const": "pnVal"
+            "const": "pnVal",
+            "description": "Particle Number"
           },
           "zeroStr": {
             "type": "string",
@@ -276,12 +306,19 @@
       "dateVal": {
         "properties": {
           "varType": {
-            "const": "date"
+            "const": "date",
+            "description": "Date value"
           },
           "dateVal": {
             "enum": [
-              "sysDate"
-            ]
+              "sysDate",
+              "localDate",
+              "calibDate",
+              "lastLkTstDate",
+              "lastLkTstPassDate",
+              "nextLkTestDate"
+            ],
+            "description": "All dates are displayed in local time, except for the sysDate (UTC system date)"
           },
           "dateFmt": {
             "enum": [
@@ -298,16 +335,24 @@
       "timeVal": {
         "properties": {
           "varType": {
-            "const": "time"
+            "const": "time",
+            "description": "Time value"
           },
           "timeVal": {
             "enum": [
-              "sysTime"
-            ]
+              "sysTime",
+              "localTime",
+              "calibTime",
+              "lastLkTstTime",
+              "lastLkTstPassTime",
+              "nextLkTestTime"
+            ],
+            "description": "All times are displayed in local time, except for the sysTime (UTC system time)"
           },
           "timeFmt": {
             "enum": [
-              "hh:mm:ss"
+              "hh:mm:ss",
+              "hh:mm"
             ]
           }
         },
@@ -320,29 +365,133 @@
       "tempVal": {
         "properties": {
           "varType": {
-            "const": "temperature"
+            "const": "temperature",
+            "description": "Temperature value"
           },
           "tempVal": {
             "enum": [
-              "evapTemp"
+              "evapTemp",
+              "ambientTemp",
+              "cellTemp",
+              "coronaChamberTemp"
             ]
           },
-          "tempFmt": {
+          "floatFmt": {
             "enum": [
               "999",
               "999.9"
             ]
           },
           "showUnits": {
-            "varType": "boolean"
+            "type": "boolean"
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
           }
         },
         "required": [
           "varType",
           "tempVal",
-          "tempFmt"
+          "floatFmt"
         ],
         "additionalProperties": false
+      },
+      "countVal": {
+        "properties": {
+          "varType": {
+            "const": "count",
+            "description": "Integer counter value"
+          },
+          "countVal": {
+            "enum": [
+              "bComErrors",
+              "bComWarnings",
+              "hComErrors",
+              "hComWarnings",
+              "benchMsgs",
+              "hostMsgs",
+              "localMsgs",
+              "respMsecs",
+              "respTimeouts"
+            ]
+          },
+          "maxLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "showUnits": {
+            "type": "boolean"
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "countVal"
+        ],
+        "additionalProperties": false
+      },
+      "stringVar": {
+        "properties": {
+          "varType": {
+            "const": "string",
+            "description": "String variables such as messages and file names"
+          },
+          "stringVar": {
+            "enum": [
+              "bComErrorMsg",
+              "bComWarningMsg",
+              "hComErrorMsg",
+              "hComWarningMsg",
+              "xferFileName",
+              "longRespCmd",
+              "lastTimeoutCmd"
+            ]
+          },
+          "maxLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
+        "required": [
+          "varType",
+          "stringVar"
+        ],
+        "additionalProperties": false
+      },
+      "progressVal": {
+        "properties": {
+          "varType": {
+            "const": "progress",
+            "description": "Progress variable expressed as an integer percentage"
+          },
+          "progressVal": {
+            "enum": [
+              "fileXferPct",
+              "warmupPct"
+            ]
+          },
+          "showUnits": {
+            "type": "boolean",
+            "description": "If showUnits is true (the default), the percent symbol will be added, e.g.- 99%"
+          },
+          "floatFmt": {
+            "enum": [
+              "999",
+              "999.9"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "progressVal",
+          "floatFmt"
+        ]
       }
     },
     "position": {
@@ -353,14 +502,15 @@
         "row": {
           "type": "integer",
           "title": "LCD Row",
-          "description": "Top row is 0.  Default will be used if not specified or the row is determined by the usage (e.g.- menu title moves from top to bottom row if a sub menu)",
+          "description": "Top row is 0.  Default of 0 will be used if not specified or if the row is fixed by the usage (e.g.- menu title moves from top to bottom row if a sub menu)",
           "minimum": 0,
-          "maximum": 1
+          "maximum": 1,
+          "default": 1
         },
         "column": {
           "type": "integer",
           "title": "LCD Column",
-          "description": "Leftmost column is 0.  Default will be used if not specified or the column is determined by the usage.",
+          "description": "Leftmost column is 0.  Default of 0 (or 19 for right justification) will be used if not specified or if the column is fixed by the usage.",
           "minimum": 0,
           "maximum": 19
         },
@@ -426,6 +576,22 @@
             126,
             62
           ]
+        },
+        "leftRightDataNav": {
+          "type": "boolean",
+          "title": "Allow left/right navigation of data screens",
+          "description": "Normally, left/right buttons are used to move between sibling submenus (submenus on the same level below a common parent menu), and up/down buttons are used to scroll through a list of data screens under a leaf menu.  If this option is enabled, then the left/right keys will also work, with the same functionality as up/down, for the data screens."
+        },
+        "decimalChar": {
+          "enum": [ ".", "," ],
+          "title": "Decimal point character"
+        },
+        "chirpMsecs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "title": "Chirp length",
+          "description": "Sets the time duration of the chirp in milliseconds.  The chirp happens when a navigation key can't execute its function such as when trying to move beyond the beginning or end of a non-wrapping list, or pressing the Enter key on a screen that doesn't support it (e.g.- a data screen). \n\nThe default is 10 milliseconds.  Zero disables the chirp."
         },
         "minFwVersion": {
           "type": "string",
