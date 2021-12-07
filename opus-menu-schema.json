@@ -216,7 +216,13 @@
                     "$ref": "#/$defs/variables/stringVar"
                   },
                   {
-                    "$ref": "#/$defs/variables/percentage"
+                    "$ref": "#/$defs/variables/percentVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/flowRates"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/pressures"
                   }
                 ]
               },
@@ -445,7 +451,7 @@
         "properties": {
           "varType": {
             "const": "string",
-            "description": "String variables such as messages and file names"
+            "description": "String variables such as messages, file names, version info"
           },
           "stringVar": {
             "enum": [
@@ -455,7 +461,9 @@
               "hComWarningMsg",
               "xferFileName",
               "longRespCmd",
-              "lastTimeoutCmd"
+              "lastTimeoutCmd",
+              "OpusFwVersion",
+              "OpusShortSHA"
             ]
           },
           "maxLength": {
@@ -470,17 +478,18 @@
         ],
         "additionalProperties": false
       },
-      "percentage": {
+      "percentVal": {
         "properties": {
           "varType": {
-            "const": "percentage",
+            "const": "percentVal",
             "description": "Percentage variable such as progress indicators"
           },
-          "percentage": {
+          "percentVal": {
             "enum": [
               "fileXferPct",
               "warmupPct",
-              "lcdContrast"
+              "lcdContrast",
+              "relHumidity"
             ]
           },
           "showUnits": {
@@ -496,8 +505,79 @@
         },
         "required": [
           "varType",
-          "percentage",
+          "percentVal",
           "floatFmt"
+        ],
+        "additionalProperties": false
+      },
+      "flowRates": {
+        "properties": {
+          "varType": {
+            "const": "flowRate",
+            "description": "Gas flow rates in L/min or mL/min"
+          },
+          "flowVal": {
+            "enum": [
+              "freshAir",
+              "sampleGas"
+            ]
+          },
+          "showUnits": {
+            "type": "boolean",
+            "description": "The units (`L/min` or `mL/min` will be shown. \n\nIf you would like a different version (such as L/m) remember that you can use fixed text to add your own units and turn off the automatic units."
+          },
+          "flowUnits": {
+            "enum": [
+              "L/min",
+              "mL/min"
+            ],
+            "description": "This will set the scaling, regardless of whether the units are actually shown or not. \n\nL/min will be shown as a fixed five digit float 9.999. \n\nmL/min will be shown as an integer with up to 4 digits."
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "flowVal"
+        ],
+        "additionalProperties": false
+      },
+      "pressures": {
+        "properties": {
+          "varType": {
+            "const": "pressure",
+            "description": "Pressures and vacuums in mbar.  Vacuums are only valid during a leak test."
+          },
+          "pressVal": {
+            "enum": [
+              "freshAirAbs",
+              "sampleGasAbs",
+              "freshAirAmb",
+              "sampleGasAmb",
+              "freshVacuum",
+              "sampleVacuum"
+            ]
+          },
+          "pressUnits": {
+            "enum": [
+              "none",
+              "mb",
+              "mbar",
+              "hPa"
+            ],
+            "description": "The scaling will always be the same, but there are several equivalent units to choose from.  Or set units to `none` to not show any"
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "pressVal",
+          "pressUnits"
         ]
       }
     },
