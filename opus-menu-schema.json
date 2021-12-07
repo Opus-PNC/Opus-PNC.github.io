@@ -132,6 +132,12 @@
           ],
           "description": "If specified, this screen will automatically be shown when the event occurs.  \nFor example, a screen to show the file transfer progress can automatically be shown when a file transfer starts. \nNote that each event can only trigger one (or no) event, so if you specify the same event for multiple screens, only the last one in the file will be activated."
         },
+        "F1action": {
+          "$ref": "#/$defs/actions"
+        },
+        "F2action": {
+          "$ref": "#/$defs/actions"
+        },
         "textBlocks": {
           "type": "array",
           "title": "Text Blocks",
@@ -210,7 +216,7 @@
                     "$ref": "#/$defs/variables/stringVar"
                   },
                   {
-                    "$ref": "#/$defs/variables/progressVal"
+                    "$ref": "#/$defs/variables/percentage"
                   }
                 ]
               },
@@ -464,16 +470,17 @@
         ],
         "additionalProperties": false
       },
-      "progressVal": {
+      "percentage": {
         "properties": {
           "varType": {
-            "const": "progress",
-            "description": "Progress variable expressed as an integer percentage"
+            "const": "percentage",
+            "description": "Percentage variable such as progress indicators"
           },
-          "progressVal": {
+          "percentage": {
             "enum": [
               "fileXferPct",
-              "warmupPct"
+              "warmupPct",
+              "lcdContrast"
             ]
           },
           "showUnits": {
@@ -489,7 +496,7 @@
         },
         "required": [
           "varType",
-          "progressVal",
+          "percentage",
           "floatFmt"
         ]
       }
@@ -525,6 +532,16 @@
         }
       },
       "additionalProperties": false
+    },
+    "actions": {
+      "enum": [
+        "startLeakTest",
+        "stopLeakTest",
+        "startPnMeas",
+        "stopPnMeas",
+        "darkenLCD",
+        "lightenLCD"
+      ]
     },
     "menuParmSet": {
       "type": "object",
