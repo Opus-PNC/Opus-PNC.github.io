@@ -308,10 +308,15 @@
             "maxLength": 16,
             "title": "Rinsing text",
             "description": "Optional text to replace the English \"Rinsing\" to describe when the bench is in the rinsing state.  Used on PN screen as \"PN: <your text here>.  If not specified, the default English will be used."
+          },
+          "useThouSep": {
+            "type": "boolean",
+            "description": "If true, a thousands separator (comma, point or space) will be used between groups of 3 digits.  The separator used is set as a global setting \"thousandsChar\" in \"menuSetParams\""
           }
         },
         "required": [
-          "varType"
+          "varType",
+          "useThouSep"
         ],
         "additionalProperties": false
       },
@@ -681,7 +686,13 @@
         },
         "decimalChar": {
           "enum": [ ".", "," ],
-          "title": "Decimal point character"
+          "title": "Decimal separator",
+          "description": "Express 5/4 as 1.25 or 1,25"
+        },
+        "thousandsChar": {
+          "enum": [ ",", ".", " "],
+          "title": "Thousands separator",
+          "description": "Express 1234 as 1,234 (US), 1.234 (Germany) or 1 234 (Sweden) for variables that have the option of showing a thousands separator."
         },
         "chirpMsecs": {
           "type": "integer",
