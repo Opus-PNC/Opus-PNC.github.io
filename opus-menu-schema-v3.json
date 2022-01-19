@@ -1,0 +1,1087 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "menuSetParams": {
+      "type": "object",
+      "$ref": "#/$defs/menuParmSet"
+    },
+    "menuStrings": {
+      "type": "object",
+      "$ref": "#/$defs/menuStringSet"
+    },
+    "menuTree": {
+      "type": "object",
+      "$ref": "#/$defs/menuItem",
+      "title": "Main menu",
+      "description": "The top level menu and (optionally) any submenus just below it"
+    },
+    "soloScreens": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/screen"
+      },
+      "title": "Special Solo Screens",
+      "description": "List of special stand-alone screens.  These screens cannot be reached with the navigation keys and will only be shown when events trigger their display (so each should have an associated `showOnEvent` or it will never show).  The Esc key will exit these screens and return to the home menu.  \nExamples are a file transfer status screen and screens for temporary notices such as a boot screen. \nEach screen is an object, so it should be wrapped in curly braces {}. \nThe order of the solo screens doesn't matter since they are not navigable siblings.  They can only return to the home screen."
+    }
+  },
+  "required": [
+    "menuSetParams",
+    "menuTree",
+    "soloScreens"
+  ],
+  "$defs": {
+    "menuItem": {
+      "type": "object",
+      "title": "Menu item",
+      "description": "Menu tree branch or leaf.  Specify \"menuType\" first to determine what other properties are required.",
+      "oneOf": [
+        {
+          "properties": {
+            "menuType": {
+              "title": "Menu type",
+              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text. \nThe data screens under a \"leaf_wrap\" will wrap around at the ends when navigating through the list.  The data screens under a \"leaf_no_wrap\" menu will not wrap around.",
+              "const": "branch"
+            },
+            "menuTitle": {
+              "type": "object",
+              "$ref": "#/$defs/fixedText",
+              "description": "Menu name to be shown on the LCD. \nDefault position is centered, but you can override that by using the position/justify property.  Row and column are ignored and are set by the firmware.  When it is shown as a submenu (on the bottom row) then it will be centered.  If left/right arrows are used to navigate submenus, keep the string length <= 18 to leave room for the arrows. \nRequires a text object, so it should be wrapped in curly braces {}.",
+              "maxLength": 20
+            },
+            "menuId": {
+              "type": "string",
+              "title": "Unique id",
+              "description": "Unique text id for reference locally and by host.  Alphanumeric with no spaces or special characters.",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+              "minLength": 2,
+              "maxLength": 12
+            },
+            "submenus": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/menuItem"
+              },
+              "description": "A list of submenus below this menu tree branch.  The submenus will be presented in the order they are in the file.  \nEach submenu is an object with multiple parameters, so it should be wrapped in curly braces {}."
+            }
+          },
+          "required": [
+            "menuType",
+            "menuTitle",
+            "menuId",
+            "submenus"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "menuType": {
+              "title": "Menu type",
+              "description": "The other settings depend on the \"menuType\" selected, so set \"menuType\" first.  A branch has submenus and a leaf has associated screens of data and/or text. \nThe data screens under a \"leaf_wrap\" will wrap around at the ends when navigating through the list.  The data screens under a \"leaf_no_wrap\" menu will not wrap around.",
+              "enum": [
+                "leaf_wrap",
+                "leaf_no_wrap"
+              ]
+            },
+            "menuTitle": {
+              "type": "object",
+              "$ref": "#/$defs/fixedText",
+              "description": "Menu name to be shown on the LCD. \nDefault position is centered, but you can override that by using the position/justify property. \nRequires a text object, so it should be wrapped in curly braces {}.",
+              "maxLength": 20
+            },
+            "menuId": {
+              "type": "string",
+              "title": "Unique id",
+              "description": "Unique text id for reference locally and by host.  Alphanumeric with no spaces or special characters.",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+              "minLength": 2,
+              "maxLength": 12
+            },
+            "screens": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/screen"
+              },
+              "description": "List of screens available under this menu tree leaf.  The screens will be presented in the order they are in the file. \nEach screen is an object, so it should be wrapped in curly braces {}."
+            }
+          },
+          "required": [
+            "menuType",
+            "menuTitle",
+            "menuId",
+            "screens"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "screen": {
+      "type": "object",
+      "title": "LCD Screen definition",
+      "description": "A screen is made up of text strings and variables.  It should contain one or the other or both.  An empty screen will be ignored.",
+      "properties": {
+        "screenId": {
+          "type": "string",
+          "title": "Unique id",
+          "description": "Unique text id for reference locally and by host.  Alphanumeric with no spaces or special characters.",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "minLength": 2,
+          "maxLength": 12
+        },
+        "showOnEvents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "fileXfer",
+              "benchCommErr",
+              "hostCommErr",
+              "leakTestPrep",
+              "leakTestStart",
+              "leakTestVacOk",
+              "leakTestFlowOk",
+              "leakTestPass",
+              "leakTestFail",
+              "leakTestCancelled",
+              "benchFwUpdate",
+              "menusLoaded",
+              "calSwActivated",
+              "calAdjExpired",
+              "zeroingStart",
+              "measureStart",
+              "bootStart",
+              "rinseStart",
+              "condTrapFull",
+              "leakTestReqd",
+              "warmupStart",
+              "errorMode",
+              "standbyStart",
+              "shutdownStart",
+              "readyStart",
+              "commandNotAllowed",
+              "benchAssert",
+              "opusFwError",
+              "blePasskey",
+              "bleStateChg"
+            ]
+          },
+          "uniqueItems": true,
+          "description": "If specified, this screen will automatically be shown when any of the events listed occurs.  \nFor example, a screen to show the file transfer progress can automatically be shown when a file transfer starts. \nNote that each event can only trigger one (or no) screen, so if you specify the same event for multiple screens, only the last one in the file will be activated."
+        },
+        "F1action": {
+          "$ref": "#/$defs/actions",
+          "description": "The action that will be executed if the F1 key is pressed while on this screen."
+        },
+        "F2action": {
+          "$ref": "#/$defs/actions",
+          "description": "The action that will be executed if the F2 key is pressed while on this screen."
+        },
+        "EscAction": {
+          "$ref": "#/$defs/actions",
+          "description": "The action that will be executed if the Esc key is pressed while on this screen."
+        },
+        "EnterAction": {
+          "$ref": "#/$defs/actions",
+          "description": "The action that will be executed if the Enter key is pressed while on this screen."
+        },
+        "ackRequired": {
+          "type": "boolean",
+          "default": false,
+          "title": "Manual keypad acknowledgment required",
+          "description": "If true then normal automatic transitions to other screens will be disabled.  This makes sure that the user sees the screen and presses a button to leave. \n\nFor orphan screens (with no parent menu) the only way to leave is to press the Esc key, so this can be combined with the EscAction showModeScreen to jump to the screen for the current mode upon exit."
+        },
+        "textBlocks": {
+          "type": "array",
+          "title": "Text Blocks",
+          "description": "Array of zero or more fixed text objects (text and position) to place on the LCD.  \nEach text object should be wrapped in curly braces {}.",
+          "items": {
+            "$ref": "#/$defs/fixedText"
+          },
+          "examples": [
+            [
+              {
+                "text": "Default position"
+              }
+            ],
+            [
+              {
+                "text": "Left justified",
+                "position": {
+                  "row": 0,
+                  "column": 0,
+                  "justify": "left"
+                }
+              }
+            ],
+            [
+              {
+                "text": "Centered text",
+                "position": {
+                  "row": 0,
+                  "column": 0,
+                  "justify": "center"
+                }
+              }
+            ],
+            [
+              {
+                "text": "Right@12:",
+                "position": {
+                  "row": 1,
+                  "column": 12,
+                  "justify": "right"
+                }
+              }
+            ]
+          ]
+        },
+        "variables": {
+          "type": "array",
+          "title": "Variables",
+          "description": "Array of zero or more variables to display on the screen. \nEach variable is an object, so it should be wrapped in curly braces {}.",
+          "items": {
+            "type": "object",
+            "title": "Variable",
+            "description": "Object specifies the variable, format and screen position",
+            "properties": {
+              "variable": {
+                "type": "object",
+                "title": "Variable Definition",
+                "description": "Variable specification.  The settings depend on the \"varType\" selected, so set \"varType\" first.",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/variables/pnVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/dateVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/timeVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/tempVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/countVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/stringVar"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/percentVal"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/flowRates"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/pressures"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/flags"
+                  },
+                  {
+                    "$ref": "#/$defs/variables/states"
+                  }
+                ]
+              },
+              "position": {
+                "type": "object",
+                "$ref": "#/$defs/position"
+              }
+            },
+            "required": [
+              "variable"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "screenId"
+      ]
+    },
+    "fixedText": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "position": {
+          "type": "object",
+          "$ref": "#/$defs/position"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [
+        {
+          "text": "Default position"
+        },
+        {
+          "text": "Left justified",
+          "position": {
+            "row": 0,
+            "column": 0,
+            "justify": "left"
+          }
+        },
+        {
+          "text": "Centered",
+          "position": {
+            "row": 0,
+            "column": 0,
+            "justify": "center"
+          }
+        },
+        {
+          "text": "Right@12:",
+          "position": {
+            "row": 1,
+            "column": 12,
+            "justify": "right"
+          }
+        }
+      ]
+    },
+    "variables": {
+      "pnVal": {
+        "description": "PN is a special case, with units always shown, and no other text allowed on the same line to ensure that the value isn't modified.",
+        "properties": {
+          "varType": {
+            "const": "pnVal",
+            "description": "Particle Number"
+          },
+          "useThouSep": {
+            "type": "boolean",
+            "description": "If true, a thousands separator (comma, point or space) will be used between groups of 3 digits.  The separator used is set as a global setting \"thousandsChar\" in \"menuSetParams\""
+          }
+        },
+        "required": [
+          "varType",
+          "useThouSep"
+        ],
+        "additionalProperties": false
+      },
+      "dateVal": {
+        "properties": {
+          "varType": {
+            "const": "date",
+            "description": "Date value"
+          },
+          "dateVal": {
+            "enum": [
+              "sysDate",
+              "localDate",
+              "calibDate",
+              "lastLkTstDate",
+              "lastLkTstPassDate",
+              "nextLkTestDate",
+              "auditDate"
+            ],
+            "description": "All dates are displayed in local time, except for the sysDate (UTC system date)"
+          },
+          "dateFmt": {
+            "enum": [
+              "yyyy.mm.dd"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "dateVal"
+        ],
+        "additionalProperties": false
+      },
+      "timeVal": {
+        "properties": {
+          "varType": {
+            "const": "time",
+            "description": "Time value"
+          },
+          "timeVal": {
+            "enum": [
+              "sysTime",
+              "localTime",
+              "calibTime",
+              "lastLkTstTime",
+              "lastLkTstPassTime",
+              "nextLkTestTime",
+              "auditTime"
+            ],
+            "description": "All times are displayed in local time, except for the sysTime (UTC system time)"
+          },
+          "timeFmt": {
+            "enum": [
+              "hh:mm:ss",
+              "hh:mm"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "timeVal"
+        ],
+        "additionalProperties": false
+      },
+      "tempVal": {
+        "properties": {
+          "varType": {
+            "const": "temperature",
+            "description": "Temperature value"
+          },
+          "tempVal": {
+            "enum": [
+              "evapTemp",
+              "ambientTemp",
+              "cellTemp",
+              "coronaChamberTemp"
+            ]
+          },
+          "floatFmt": {
+            "enum": [
+              "999",
+              "999.9"
+            ]
+          },
+          "showUnits": {
+            "type": "boolean"
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "tempVal",
+          "floatFmt"
+        ],
+        "additionalProperties": false
+      },
+      "countVal": {
+        "properties": {
+          "varType": {
+            "const": "count",
+            "description": "Integer counter value"
+          },
+          "countVal": {
+            "enum": [
+              "bComErrors",
+              "bComWarnings",
+              "hComErrors",
+              "hComWarnings",
+              "benchMsgs",
+              "hostMsgs",
+              "localMsgs",
+              "respMsecs",
+              "respTimeouts",
+              "submodeCount",
+              "daysToCalExpire"
+            ]
+          },
+          "maxLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "showUnits": {
+            "type": "boolean"
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "countVal"
+        ],
+        "additionalProperties": false
+      },
+      "stringVar": {
+        "properties": {
+          "varType": {
+            "const": "string",
+            "description": "String variables such as messages, file names, version info"
+          },
+          "stringVar": {
+            "enum": [
+              "bComErrorMsg",
+              "bComWarningMsg",
+              "hComErrorMsg",
+              "hComWarningMsg",
+              "xferFileName",
+              "longRespCmd",
+              "lastTimeoutCmd",
+              "OpusFwVersion",
+              "OpusShortSHA",
+              "benchAssertRow0",
+              "benchAssertRow1",
+              "OpusFwErrorRow0",
+              "OpusFwErrorRow1",
+              "blePasskeyString"
+            ]
+          },
+          "maxLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
+        "required": [
+          "varType",
+          "stringVar"
+        ],
+        "additionalProperties": false
+      },
+      "percentVal": {
+        "properties": {
+          "varType": {
+            "const": "percentVal",
+            "description": "Percentage variable such as progress indicators"
+          },
+          "percentVal": {
+            "enum": [
+              "fileXferPct",
+              "warmupPct",
+              "lcdContrast",
+              "relHumidity"
+            ]
+          },
+          "showUnits": {
+            "type": "boolean",
+            "description": "If showUnits is true (the default), the percent symbol will be added, e.g.- 99%"
+          },
+          "floatFmt": {
+            "enum": [
+              "999",
+              "999.9"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "percentVal",
+          "floatFmt"
+        ],
+        "additionalProperties": false
+      },
+      "flowRates": {
+        "properties": {
+          "varType": {
+            "const": "flowRate",
+            "description": "Gas flow rates in L/min or mL/min"
+          },
+          "flowVal": {
+            "enum": [
+              "freshAir",
+              "sampleGas"
+            ]
+          },
+          "showUnits": {
+            "type": "boolean",
+            "description": "The units (`L/min` or `mL/min` will be shown. \n\nIf you would like a different version (such as L/m) remember that you can use fixed text to add your own units and turn off the automatic units."
+          },
+          "flowUnits": {
+            "enum": [
+              "L/min",
+              "mL/min"
+            ],
+            "description": "This will set the scaling, regardless of whether the units are actually shown or not. \n\nL/min will be shown as a fixed five digit float 9.999. \n\nmL/min will be shown as an integer with up to 4 digits."
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "flowVal"
+        ],
+        "additionalProperties": false
+      },
+      "pressures": {
+        "properties": {
+          "varType": {
+            "const": "pressure",
+            "description": "Pressures and vacuums in mbar.  Vacuums are only valid during a leak test."
+          },
+          "pressVal": {
+            "enum": [
+              "freshAirAbs",
+              "sampleGasAbs",
+              "freshAirAmb",
+              "sampleGasAmb",
+              "freshVacuum",
+              "sampleVacuum"
+            ]
+          },
+          "pressUnits": {
+            "enum": [
+              "none",
+              "mb",
+              "mbar",
+              "hPa"
+            ],
+            "description": "The scaling will always be the same, but there are several equivalent units to choose from.  Or set units to `none` to not show any"
+          },
+          "spaceBeforeUnits": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the value and units"
+          }
+        },
+        "required": [
+          "varType",
+          "pressVal",
+          "pressUnits"
+        ]
+      },
+      "flags": {
+        "properties": {
+          "varType": {
+            "const": "flag",
+            "description": "Single character flag such as the PN validity flags"
+          },
+          "flagVal": {
+            "enum": [
+              "pnValid",
+              "sensorValid"
+            ]
+          }
+        },
+        "required": [
+          "varType",
+          "flagVal"
+        ]
+      },
+      "states": {
+        "properties": {
+          "varType": {
+            "const": "state",
+            "description": "State variables such as the bench mode and submode and leak test status.  These get translated into strings set in the \"menuSetParams\"."
+          },
+          "stateVal": {
+            "enum": [
+              "benchMode",
+              "benchSubmode",
+              "lktFreshVac",
+              "lktFreshFlow",
+              "lktSampleVac",
+              "lktSampleFlow",
+              "calibSwitch",
+              "bleState"
+            ]
+          },
+          "showCount": {
+            "type": "boolean",
+            "title": "Show countdown timer for bench Submodes",
+            "description": "If this is set to true and the submode has a countdown timer, then it will be shown after the submode string and a colon, for example \"Rinsing: 5s\"."
+          },
+          "spaceBeforeCount": {
+            "type": "boolean",
+            "description": "If true, a space will be inserted between the colon ':' and the countdown timer"
+          },
+          "floatFmt": {
+            "enum": [
+              "999",
+              "999.9"
+            ],
+            "description": "The float format is used for percentage progress indicators such as warmup."
+          }
+        },
+        "required": [
+          "varType",
+          "stateVal"
+        ]
+      }
+    },
+    "position": {
+      "type": "object",
+      "title": "LCD position",
+      "description": "Optional coordinates and justification to specify the position on the screen",
+      "properties": {
+        "row": {
+          "type": "integer",
+          "title": "LCD Row",
+          "description": "Top row is 0.  Default of 0 will be used if not specified or if the row is fixed by the usage (e.g.- menu title moves from top to bottom row if a sub menu)",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "column": {
+          "type": "integer",
+          "title": "LCD Column",
+          "description": "Leftmost column is 0.  Default of 0 (or 19 for right justification) will be used if not specified or if the column is fixed by the usage.",
+          "minimum": 0,
+          "maximum": 19
+        },
+        "justify": {
+          "title": "Text justification",
+          "description": "How to position the text within the row or field.  Left or right justification is against the specified (or default) column.  Center justification centers on the whole row.",
+          "enum": [
+            "left",
+            "right",
+            "center"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "actions": {
+      "enum": [
+        "startLeakTest",
+        "stopLeakTest",
+        "startPnMeas",
+        "stopPnMeas",
+        "darkenLCD",
+        "lightenLCD",
+        "pausePN",
+        "resumePN",
+        "showModeScreen"
+      ]
+    },
+    "menuParmSet": {
+      "type": "object",
+      "required": [
+        "menuSetName",
+        "language",
+        "useMenuArrows",
+        "minFwVersion",
+        "schemaVersion",
+        "menuFileRev"
+      ],
+      "properties": {
+        "menuSetName": {
+          "type": "string",
+          "description": "Name that will be reported to host to check which screen set is installed.    Alphanumeric with no spaces or special characters other than _ (underscore).",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "minLength": 4,
+          "maxLength": 20
+        },
+        "language": {
+          "enum": [
+            "English",
+            "German"
+          ],
+          "description": "Which language is used on the screens.  This is required to enable special handling for non-ASCII letters."
+        },
+        "useMenuArrows": {
+          "type": "boolean",
+          "title": "Use Menu Arrows?",
+          "description": "If true, left and right arrows will be used to indicate when there are more submenu items that can be accessed through the left and right keys.",
+          "default": true
+        },
+        "leftArrowCode": {
+          "type": "integer",
+          "description": "Character code for left arrow for menu navigation.  Suggestions: 127 for left arrow, 60 for ASCII '<'",
+          "minimum": 0,
+          "maximum": 255,
+          "examples": [
+            127,
+            60
+          ]
+        },
+        "rightArrowCode": {
+          "type": "integer",
+          "description": "Character code for right arrow for menu navigation.  Suggestions: 126 for right arrow, 62 for ASCII '>'",
+          "minimum": 0,
+          "maximum": 255,
+          "examples": [
+            126,
+            62
+          ]
+        },
+        "leftRightDataNav": {
+          "type": "boolean",
+          "title": "Allow left/right navigation of data screens",
+          "description": "Normally, left/right buttons are used to move between sibling submenus (submenus on the same level below a common parent menu), and up/down buttons are used to scroll through a list of data screens under a leaf menu.  If this option is enabled, then the left/right keys will also work, with the same functionality as up/down, for the data screens."
+        },
+        "escLktPassOnVacRel": {
+          "type": "boolean",
+          "title": "Escape leakTestPass screen on vacuum release",
+          "description": "If the leakTestPass showOnEvent is used to transition to a screen upon passing the leak test, that same screen will be \"Escaped\" (the equivalent of pressing the Esc key) when the vacuum from the test is released. \n\nThis can be combined with the ackRequired flag and an EscAction to showModeScreen to show the pass screen as long as the vacuum still exists, and then automatically switch to the mode screen when the vacuum is released."
+        },
+        "decimalChar": {
+          "enum": [
+            ".",
+            ","
+          ],
+          "title": "Decimal separator",
+          "description": "Express 5/4 as 1.25 or 1,25"
+        },
+        "thousandsChar": {
+          "enum": [
+            ",",
+            ".",
+            " "
+          ],
+          "title": "Thousands separator",
+          "description": "Express 1234 as 1,234 (US), 1.234 (Germany) or 1 234 (Sweden) for variables that have the option of showing a thousands separator."
+        },
+        "chirpMsecs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "title": "Chirp length",
+          "description": "Sets the time duration of the chirp in milliseconds.  The chirp happens when a navigation key can't execute its function such as when trying to move beyond the beginning or end of a non-wrapping list, or pressing the Enter key on a screen that doesn't support it (e.g.- a data screen). \n\nThe default is 10 milliseconds.  Zero disables the chirp."
+        },
+        "minFwVersion": {
+          "type": "string",
+          "const": "0.1.19",
+          "default": "0.1.19",
+          "title": "Minimum Opus FW version",
+          "description": "This version or later is required to be able to parse all the features of this JSON schema."
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "const": 3,
+          "default": 3,
+          "title": "Menu file JSON schema version",
+          "description": "This defines the JSON data structure that this file conforms to, set by the standard reference file referred to in \"$schema\""
+        },
+        "menuFileRev": {
+          "type": "integer",
+          "title": "Menu File Revision",
+          "description": "Single integer revision number for this menu file.  You may use whatever numbering scheme you like.  The host may use this to determine if the installed file needs to be updated.",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      },
+      "additionalProperties": false
+    },
+    "menuStringSet": {
+      "type": "object",
+      "title": "String replacements",
+      "description": "Optional replacement or translated text for default English strings to describe bench states, for example.  For any that are not specified, the default English will be used.\n\nNote that some strings have shorter max lengths in order to leave room for an associated countdown timer.",
+      "properties": {
+        "unknownStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Unknown mode label",
+          "description": "Optional text to replace \"Unknown\" to describe when the bench is in an uknown state."
+        },
+        "bootingStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Booting mode label",
+          "description": "Optional text to replace \"Boot Up\" to describe when the bench is in the boot state."
+        },
+        "remainingStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Remaining label",
+          "description": "Optional text to replace \"Remaining\" to go before the boot countdown timer."
+        },
+        "serviceStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Service mode label",
+          "description": "Optional text to replace \"Service\" to describe when the bench is in the service state."
+        },
+        "periphOffStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Peripherals Off label",
+          "description": "Optional text to replace \"Peripherals Off\" to describe the submode when the peripherals are being turned off."
+        },
+        "condTrapFullStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Condensate Trap Full label",
+          "description": "Optional text to replace \"Cond. Trap Full\" to describe the service submode when the condensate trap is full and needs to be emptied."
+        },
+        "leakTestReqdStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Leak Test Required label",
+          "description": "Optional text to replace \"Leak Test Required\" to describe the service submode when a leak test is required."
+        },
+        "readyStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Ready mode label",
+          "description": "Optional text to replace \"Ready\" to describe when the bench is in the readiness state."
+        },
+        "warmupStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Warmup label",
+          "description": "Optional text to replace \"Warm Up\" to describe the readiness submode when the bench is still warming up."
+        },
+        "rinsingStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Rinsing label",
+          "description": "Optional text to replace \"Rinsing\" to describe when the bench is in the rinsing state."
+        },
+        "measuringStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Measurement mode label",
+          "description": "Optional text to replace \"Measurement\" to describe when the bench is in the measurement mode."
+        },
+        "zeroingStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Zeroing label",
+          "description": "Optional text to replace \"Zeroing\" to describe when the bench is in the zeroing state."
+        },
+        "errorModeStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Error mode label",
+          "description": "Optional text to replace \"Error State\" to describe when the bench is in the error state."
+        },
+        "standbyStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Standby mode label",
+          "description": "Optional text to replace \"Standby\" to describe when the bench is in the standby state."
+        },
+        "updateLrStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Update LR label",
+          "description": "Optional text to replace \"Update LR\" to describe when the bench is receiving new legally relevant controller firmware."
+        },
+        "updateNlrStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Update NLR label",
+          "description": "Optional text to replace \"Update NLR\" to describe when the bench is receiving new non-legally relevant controller firmware."
+        },
+        "updateBothStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Update Both label",
+          "description": "Optional text to replace \"Update Both\" to describe when the bench is receiving new legally and non-legally relevant controller firmware."
+        },
+        "updateSensorStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Update Sensor label",
+          "description": "Optional text to replace \"Update Sensor\" to describe when the bench is receiving new particle sensor board firmware."
+        },
+        "loadingFileStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Bench update Loading File label",
+          "description": "Optional text to replace \"Loading File\" to describe when the bench is receiving new firmware and is loading the file."
+        },
+        "updatingFwStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Updating firmware label",
+          "description": "Optional text to replace \"Updating\" to describe when the bench has received new firmware and is in the process of updating it by writing it to flash."
+        },
+        "doneRstStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Done - Reset label",
+          "description": "Optional text to replace \"Done, Will Reset\" to describe when the bench has received new firmware, finished installing it and is rebooting to start the new firmware."
+        },
+        "shutdownStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Shutdown mode label",
+          "description": "Optional text to replace \"Shutdown\" to describe when the bench is in the shutdown state."
+        },
+        "leakTestModeStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Leak Test mode label",
+          "description": "Optional text to replace \"Leak Test\" to describe when the bench is in the leak test state."
+        },
+        "lktPrepStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Leak Test - Preparing label",
+          "description": "Optional text to replace \"Prepare\" to describe when the bench is in the leak test state and the preparation sub-state."
+        },
+        "lktTestStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Leak Test - Testing label",
+          "description": "Optional text to replace \"Testing\" to describe when the bench is in the leak test state and the actual test is in progress."
+        },
+        "lktPassedStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Leak Test - Passed label",
+          "description": "Optional text to replace \"Passed\" to describe when the bench is in the leak test state and the test has passed.  This mode is not included in the new Opus managed leak test."
+        },
+        "expiredStr": {
+          "type": "string",
+          "maxLength": 12,
+          "title": "Cal/Adj Expired label",
+          "description": "Optional text to replace \"Expired\" to describe when the calibration/adjustment validity period has passed."
+        },
+        "vacOkStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Leak Test - Vacuum OK label",
+          "description": "Optional text to replace \"OK\" to describe when the vacuum is high enough to meet the requirements for passing a leak test."
+        },
+        "vacLowStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Leak Test - Vacuum Low label",
+          "description": "Optional text to replace \"Low\" to describe when the vacuum is below the requirements for passing a leak test."
+        },
+        "flowOkStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Leak Test - Flow OK label",
+          "description": "Optional text to replace \"OK\" to describe when the flow rate is low enough to meet the requirements for passing a leak test."
+        },
+        "flowHighStr": {
+          "type": "string",
+          "maxLength": 16,
+          "title": "Leak Test - Flow High label",
+          "description": "Optional text to replace \"High\" to describe when the flow rate is too high to pass the leak test."
+        },
+        "calSwActiveStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Cal Switch Active Label",
+          "description": "Optional text to replace \"Active\" to describe the calibration switch state.  Active means unlocked."
+        },
+        "calSwInactiveStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "Cal Switch Inactive Label",
+          "description": "Optional text to replace \"Inactive\" to describe the calibration switch state.  Inactive is the normal locked state."
+        },
+        "bleConnectedStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "BLE Connected String",
+          "description": "Optional text to replace \"Connected\" to describe the BLE connected state."
+        },
+        "bleUnconnectedStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "BLE Unconnected String",
+          "description": "Optional text to replace \"Disconnected\" to describe the BLE connected state."
+        },
+        "blePairedStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "BLE Paired String",
+          "description": "Optional text to replace \"Connected/Paired\" to describe the BLE connected and paired state."
+        },
+        "bleBondedConnStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "BLE Bonded Connection String",
+          "description": "Optional text to replace \"Connected/Bonded\" to describe the BLE connected and bonded state."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
