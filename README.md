@@ -4,7 +4,7 @@ This repo is a means to publish JSON schema files on a public site so that they 
 
 ```json
 {
-  "$schema": "https://Opus-PNC.github.io/opus-menu-schema-v2.json",
+  "$schema": "https://Opus-PNC.github.io/opus-menu-schema-v6.json",
   "menuTree": {
     "menuType": "branch",
     "menuId": "mainMenu",
@@ -30,3 +30,5 @@ Links:
 [https://Opus-PNC.github.io/opus-menu-schema-v4.json](https://Opus-PNC.github.io/opus-menu-schema-v4.json)
 
 [https://Opus-PNC.github.io/opus-menu-schema-v5.json](https://Opus-PNC.github.io/opus-menu-schema-v5.json)
+
+[https://Opus-PNC.github.io/opus-menu-schema-v6.json](https://Opus-PNC.github.io/opus-menu-schema-v6.json)
