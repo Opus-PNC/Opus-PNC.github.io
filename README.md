@@ -34,3 +34,5 @@ Links:
 [https://Opus-PNC.github.io/opus-menu-schema-v6.json](https://Opus-PNC.github.io/opus-menu-schema-v6.json)
 
 [https://Opus-PNC.github.io/opus-menu-schema-v7.json](https://Opus-PNC.github.io/opus-menu-schema-v7.json)
+
+[https://Opus-PNC.github.io/opus-menu-schema-v8.json](https://Opus-PNC.github.io/opus-menu-schema-v8.json)
