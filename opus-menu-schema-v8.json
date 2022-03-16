@@ -147,7 +147,8 @@
               "ready",
               "notReady",
               "standby",
-              "shutdown"
+              "shutdown",
+              "hostActive"
             ]
           },
           "uniqueItems": true,
@@ -163,7 +164,8 @@
               "ready",
               "notReady",
               "standby",
-              "shutdown"
+              "shutdown",
+              "hostActive"
             ]
           },
           "uniqueItems": true,
