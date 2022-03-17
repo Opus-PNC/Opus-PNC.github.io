@@ -885,6 +885,12 @@
           "title": "Chirp length",
           "description": "Sets the time duration of the chirp in milliseconds.  The chirp happens when a navigation key can't execute its function such as when trying to move beyond the beginning or end of a non-wrapping list, or pressing the Enter key on a screen that doesn't support it (e.g.- a data screen). \n\nThe default is 10 milliseconds.  Zero disables the chirp."
         },
+        "autoAckSecs": {
+          "type": "integer",
+          "minimum": 0,
+          "title": "Automatic screen acknowledgement timer",
+          "description": "For screens that require the Esc key be pressed to acknowledge that you have seen it before it switches to another screen, this timer allows the Ack requirement to time out and allow the screen to change without an Esc press.  Set to zero to disable the timeout and always require an Esc press.\n\nFor example, if set to 5 then if the Leak Test Fail screen has an `ackRequired`, the screen will be released in 5 seconds without a press.  It will then change as soon as some event or condition triggers switching to a new screen."
+        },
         "minFwVersion": {
           "type": "string",
           "const": "0.1.27",
