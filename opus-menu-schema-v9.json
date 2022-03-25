@@ -188,7 +188,8 @@
               "notReady",
               "standby",
               "shutdown",
-              "hostActive"
+              "hostActive",
+              "leakChecking"
             ]
           },
           "uniqueItems": true,
@@ -531,6 +532,7 @@
               "respTimeouts",
               "submodeCount",
               "daysToCalExpire",
+              "daysToAuditExpire",
               "uiFileVerNo"
             ]
           },
