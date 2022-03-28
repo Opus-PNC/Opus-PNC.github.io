@@ -189,7 +189,11 @@
               "standby",
               "shutdown",
               "hostActive",
-              "leakChecking"
+              "leakChecking",
+              "booting",
+              "errorMode",
+              "condTrapFull",
+              "modeUnknown"
             ]
           },
           "uniqueItems": true,
@@ -206,7 +210,12 @@
               "notReady",
               "standby",
               "shutdown",
-              "hostActive"
+              "hostActive",
+              "leakChecking",
+              "booting",
+              "errorMode",
+              "condTrapFull",
+              "modeUnknown"
             ]
           },
           "uniqueItems": true,
@@ -426,7 +435,8 @@
               "nextLkTestDate",
               "auditDate",
               "maniMcFwDate",
-              "maniMoFwDate"
+              "maniMoFwDate",
+              "maniInstDate"
             ],
             "description": "All dates are displayed in local time, except for the sysDate (UTC system date)"
           },
@@ -461,7 +471,9 @@
               "nextLkTestTime",
               "auditTime",
               "maniMcFwTime",
-              "maniMoFwTime"
+              "maniMoFwTime",
+              "maniInstTime",
+              "wakeupTime"
             ],
             "description": "All times are displayed in local time, except for the sysTime (UTC system time)"
           },
@@ -489,7 +501,8 @@
               "evapTemp",
               "ambientTemp",
               "cellTemp",
-              "coronaChamberTemp"
+              "coronaChamberTemp",
+              "standbyTemp"
             ]
           },
           "floatFmt": {
@@ -533,7 +546,9 @@
               "submodeCount",
               "daysToCalExpire",
               "daysToAuditExpire",
-              "uiFileVerNo"
+              "uiFileVerNo",
+              "standbyTimeoutMins",
+              "shutdownTimeoutMins"
             ]
           },
           "maxLength": {
@@ -622,7 +637,8 @@
               "fileXferPct",
               "warmupPct",
               "lcdContrast",
-              "relHumidity"
+              "relHumidity",
+              "sampleHumidity"
             ]
           },
           "showUnits": {
@@ -747,7 +763,9 @@
               "lktSampleFlow",
               "calibSwitch",
               "bleState",
-              "hostPort"
+              "hostPort",
+              "controlSrc",
+              "pnValidity"
             ]
           },
           "showCount": {
@@ -1229,6 +1247,42 @@
           "maxLength": 20,
           "title": "Host Inactive String",
           "description": "Optional text to replace \"Inactive\" to describe the current host connection when there is no activity."
+        },
+        "hostControlStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "`Host is in control` String",
+          "description": "Optional text to replace \"Host Controlled\" to describe that the host is actively communicating with the PNC.  See the localControlStr for the other possible state."
+        },
+        "localControlStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "`Local Control` String",
+          "description": "Optional text to replace \"Local Control\" to describe that the host is NOT actively communicating with the PNC, so the keypad is control of measurement mode.  See the hostControlStr for the other possible state."
+        },
+        "pnValidStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "PN Valid String",
+          "description": "Optional text to replace \"Valid\" to describe when the PN value is valid.  Leaving this blank might also be a good choice.  Used by the `pnValidity` state variable."
+        },
+        "pnPausedStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "PN Paused String",
+          "description": "Optional text to replace \"Paused\" to describe when the PN value is paused."
+        },
+        "pnErrorStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "PN Error String",
+          "description": "Optional text to replace \"Error\" to describe when the PN value is not being displayed due to an error."
+        },
+        "pnOutOfRangeStr": {
+          "type": "string",
+          "maxLength": 20,
+          "title": "PN Out of Range String",
+          "description": "Optional text to replace \"Out of Range\" to describe when the PN value is either above or below the range where the values are certified for accuracy."
         }
       },
       "additionalProperties": false
