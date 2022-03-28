@@ -876,7 +876,8 @@
           "blePasskey",
           "bleStateChg",
           "bleBondFormed",
-          "manifestFail"
+          "manifestFail",
+          "nightlyReboot"
         ]
       },
       "uniqueItems": true,
