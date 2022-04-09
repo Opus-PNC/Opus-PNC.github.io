@@ -936,7 +936,7 @@
           "bleStateChg",
           "bleBondFormed",
           "manifestFail",
-          "nightlyReboot"
+          "rebootStart"
         ]
       },
       "uniqueItems": true,
